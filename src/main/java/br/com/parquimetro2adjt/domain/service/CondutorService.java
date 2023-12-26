@@ -15,7 +15,7 @@ public class CondutorService {
     private CondutorRepository condutorRepository;
 
     public CondutorResponseDTO create(CondutorRequestDTO requestDTO) {
-        return toResponse(condutorRepository.save(toCondutor(requestDTO)));
+        return toResponseDTO(condutorRepository.save(toCondutor(requestDTO)));
     }
 
     public List<Condutor> getAll() {
@@ -30,7 +30,7 @@ public class CondutorService {
         condutor.setFormaPagamento(requestDTO.formaPagamento());
         condutor.setEndereco(requestDTO.endereco());
 
-        return toResponse(this.condutorRepository.save(condutor));
+        return toResponseDTO(this.condutorRepository.save(condutor));
     }
 
     public void delete(String id){
@@ -48,7 +48,7 @@ public class CondutorService {
         return condutor;
     }
 
-    public CondutorResponseDTO toResponse(Condutor condutor) {
+    public CondutorResponseDTO toResponseDTO(Condutor condutor) {
         return new CondutorResponseDTO(
                 condutor.getId(),
                 condutor.getNome(),
