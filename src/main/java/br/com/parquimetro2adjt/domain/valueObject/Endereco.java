@@ -1,12 +1,12 @@
 package br.com.parquimetro2adjt.domain.valueObject;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 public class Endereco {
 
     private String cep;
