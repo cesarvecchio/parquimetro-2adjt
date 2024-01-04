@@ -2,9 +2,16 @@ package br.com.parquimetro2adjt.application.controller;
 
 import br.com.parquimetro2adjt.application.request.CondutorRequestDTO;
 import br.com.parquimetro2adjt.application.response.CondutorResponseDTO;
+import br.com.parquimetro2adjt.application.response.VeiculoResponseDTO;
 import br.com.parquimetro2adjt.domain.entity.Condutor;
+import br.com.parquimetro2adjt.domain.entity.Veiculo;
+import br.com.parquimetro2adjt.domain.enums.PagamentoEnum;
 import br.com.parquimetro2adjt.domain.service.CondutorService;
+import br.com.parquimetro2adjt.domain.valueObject.Endereco;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,23 +26,34 @@ public class CondutorController {
     private CondutorService condutorService;
 
     @PostMapping
-    public ResponseEntity<CondutorResponseDTO> create(@RequestBody CondutorRequestDTO requestDTO){
-        return ResponseEntity.status(HttpStatus.CREATED).body(condutorService.create(requestDTO));
+    public ResponseEntity<CondutorResponseDTO> cadastrar(@RequestBody CondutorRequestDTO condutorDTO) {
+        return ResponseEntity.ok(condutorService.cadastrar(condutorDTO));
     }
 
     @GetMapping
-    public ResponseEntity<List<Condutor>> getAll(){
-        return ResponseEntity.ok(condutorService.getAll());
+    public ResponseEntity<Page<CondutorResponseDTO>> findAll(@PageableDefault(size = 10, page = 0, sort = "nome") Pageable pageable,
+                                                            @RequestParam(required = false) String nome,
+                                                            @RequestParam(required = false) String email,
+                                                            @RequestParam(required = false) String cpf,
+                                                            @RequestParam(required = false) PagamentoEnum formaPagamento,
+                                                            @RequestParam(required = false) Endereco endereco,
+                                                            @RequestParam(required = false) List<Veiculo> veiculos) {
+        return ResponseEntity.ok(condutorService.findAll(pageable, nome, email, cpf, formaPagamento, endereco, veiculos));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CondutorResponseDTO> consultarPorId(@PathVariable String id) {
+        return ResponseEntity.ok(condutorService.toResponseDto(condutorService.buscaPorId(id)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CondutorResponseDTO> update(@PathVariable String id, @RequestBody CondutorRequestDTO requestDTO) {
-        return ResponseEntity.ok(this.condutorService.update(id, requestDTO));
+    public ResponseEntity<CondutorResponseDTO> atualizar(@PathVariable String id, @RequestBody CondutorRequestDTO condutorRequestDTO) {
+        return ResponseEntity.ok(condutorService.atualizar(id, condutorRequestDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        this.condutorService.delete(id);
+    public ResponseEntity<Void> deletar(@PathVariable String id) {
+        condutorService.deletar(id);
 
         return ResponseEntity.noContent().build();
     }

@@ -9,6 +9,7 @@ import br.com.parquimetro2adjt.domain.entity.Condutor;
 import br.com.parquimetro2adjt.domain.entity.Veiculo;
 import br.com.parquimetro2adjt.infra.repository.VeiculoRepository;
 import br.com.parquimetro2adjt.utils.Utils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -53,6 +54,10 @@ public class VeiculoService {
     public VeiculoResponseDTO cadastrar(VeiculoRequestDTO veiculoRequestDTO, String idCondutor) {
         Veiculo veiculo = toEntity(veiculoRequestDTO);
         veiculo.setCondutor(condutorService.buscaPorId(idCondutor));
+
+        /* VERIFICAR SE É A MANEIRA CORRETA DE VINCULAR O VEICULO AO CONDUTOR
+        Condutor condutor = condutorService.buscaPorId(idCondutor);
+        condutor.getVeiculos().add(veiculo);*/
 
         return toResponseDTO(veiculoRepository.save(veiculo));
     }

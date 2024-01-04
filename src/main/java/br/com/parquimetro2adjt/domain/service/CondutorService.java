@@ -4,10 +4,17 @@ import br.com.parquimetro2adjt.application.controller.exceptions.CpfException;
 import br.com.parquimetro2adjt.application.controller.exceptions.NaoEncontradoException;
 import br.com.parquimetro2adjt.application.request.CondutorRequestDTO;
 import br.com.parquimetro2adjt.application.response.CondutorResponseDTO;
+import br.com.parquimetro2adjt.application.response.VeiculoResponseDTO;
 import br.com.parquimetro2adjt.domain.entity.Condutor;
+import br.com.parquimetro2adjt.domain.entity.Veiculo;
+import br.com.parquimetro2adjt.domain.enums.PagamentoEnum;
+import br.com.parquimetro2adjt.domain.valueObject.Endereco;
 import br.com.parquimetro2adjt.infra.repository.CondutorRepository;
 import br.com.parquimetro2adjt.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -52,6 +59,27 @@ public class CondutorService {
                         String.format("Condutor com o id '%d' não encontrado", idCondutor)));
     }
 
+    public Page<CondutorResponseDTO> findAll(Pageable pageable,
+                                            String nome,
+                                            String email,
+                                            String cpf,
+                                            PagamentoEnum formaPagamento,
+                                            Endereco endereco,
+                                            List<Veiculo> veiculos) {
+        Example<Condutor> example = Example.of(Condutor.builder()
+                .nome(nome)
+                .email(email)
+                .cpf(cpf)
+                .formaPagamento(formaPagamento)
+                .endereco(endereco)
+                .veiculos(veiculos)
+                .build()
+        );
+
+        Page<Condutor> condutor = condutorRepository.findAll(example, pageable);
+        return condutor.map(this::toResponseDto);
+    }
+
     private boolean cpfExistente(String cpf) {
         return condutorRepository.existsByCpf(cpf);
     }
@@ -70,7 +98,8 @@ public class CondutorService {
                 condutor.getCpf(),
                 condutor.getEmail(),
                 condutor.getFormaPagamento(),
-                condutor.getEndereco()
+                condutor.getEndereco(),
+                condutor.getVeiculos()
         );
     }
 
