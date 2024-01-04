@@ -3,6 +3,7 @@ package br.com.parquimetro2adjt.domain.service;
 import br.com.parquimetro2adjt.application.controller.exceptions.NaoEncontradoException;
 import br.com.parquimetro2adjt.application.controller.exceptions.VeiculoNaoPertenceAoCondutorException;
 import br.com.parquimetro2adjt.application.request.VeiculoRequestDTO;
+import br.com.parquimetro2adjt.application.response.CondutorResponseDTO;
 import br.com.parquimetro2adjt.application.response.VeiculoResponseDTO;
 import br.com.parquimetro2adjt.domain.entity.Condutor;
 import br.com.parquimetro2adjt.domain.entity.Veiculo;
@@ -34,11 +35,14 @@ public class VeiculoService {
                                             String placa,
                                             String modelo,
                                             String cor,
-                                            String marca) {
+                                            String marca,
+                                            Condutor condutor) {
         Example<Veiculo> example = Example.of(Veiculo.builder()
                 .placa(placa)
                 .modelo(modelo)
                 .cor(cor)
+                .marca(marca)
+                .condutor(condutor)
                 .build()
         );
 

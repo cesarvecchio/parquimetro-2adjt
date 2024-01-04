@@ -8,7 +8,6 @@ public record VeiculoResponseDTO(
         String modelo,
         String cor,
         String marca,
-
         CondutorResponseDTO condutor
 ) {
 }
