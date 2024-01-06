@@ -55,9 +55,9 @@ public class VeiculoService {
         Veiculo veiculo = toEntity(veiculoRequestDTO);
         veiculo.setCondutor(condutorService.buscaPorId(idCondutor));
 
-        /* VERIFICAR SE É A MANEIRA CORRETA DE VINCULAR O VEICULO AO CONDUTOR
-        Condutor condutor = condutorService.buscaPorId(idCondutor);
-        condutor.getVeiculos().add(veiculo);*/
+        //VERIFICAR SE É A MANEIRA CORRETA DE VINCULAR O VEICULO AO CONDUTOR
+        //Condutor condutor = condutorService.buscaPorId(idCondutor);
+        //condutor.getVeiculos().addAll()
 
         return toResponseDTO(veiculoRepository.save(veiculo));
     }
