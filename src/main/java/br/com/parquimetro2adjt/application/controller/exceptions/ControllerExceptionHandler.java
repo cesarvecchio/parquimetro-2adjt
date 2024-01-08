@@ -55,4 +55,19 @@ public class ControllerExceptionHandler {
 
         return ResponseEntity.status(status).body(standardError);
     }
+
+    @ExceptionHandler(CadastradoException.class)
+    public ResponseEntity<StandardError> possuiCadastro(CadastradoException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+
+        StandardError standardError = StandardError.builder()
+                .timestamp(Instant.now())
+                .status(status.value())
+                .error("Já possui cadastro!")
+                .message(e.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(status).body(standardError);
+    }
 }
