@@ -1,8 +1,12 @@
 package br.com.parquimetro2adjt.infra.repository;
 
 import br.com.parquimetro2adjt.domain.entity.Condutor;
+import br.com.parquimetro2adjt.domain.entity.Veiculo;
+import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CondutorRepository extends MongoRepository<Condutor, String> {
@@ -11,4 +15,12 @@ public interface CondutorRepository extends MongoRepository<Condutor, String> {
     Boolean existsByCpf(String cpf);
 
     Optional<Condutor> findByEmailAndSenha(String email, String senha);
+
+    //Metodos do veiculos
+
+    @Query("{ 'veiculos' : { $elemMatch : { placa : 'BRA2E19' } } }")
+    Boolean existsVeiculoPorPlaca(String id);
+
+    @Query("{ 'veiculos' : { $elemMatch : { placa : ?0 } } }")
+    Optional<Condutor> findVeiculoPorPlaca(String id);
 }
