@@ -91,6 +91,11 @@ public class CondutorService {
 
     }
 
+    public CondutorResponseDTO cadastarVeiculo(Condutor condutor, Veiculo veiculo){
+        condutor.getVeiculos().add(veiculo);
+        return toResponseDto(condutorRepository.save(condutor));
+    }
+
     public CondutorResponseDTO toResponseDto(Condutor condutor) {
         return new CondutorResponseDTO(
                 condutor.getId(),
