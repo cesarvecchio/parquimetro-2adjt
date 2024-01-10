@@ -6,6 +6,5 @@ import java.time.LocalDateTime;
 
 public record EstacionamentoRequestDTO(
     TipoEstacionamentoEnum tipoEstacionamento,
-    Integer duracaoDesejada,
-    LocalDateTime horaInicial
+    Integer duracaoDesejada
 ){}

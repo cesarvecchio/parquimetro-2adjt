@@ -70,4 +70,36 @@ public class ControllerExceptionHandler {
 
         return ResponseEntity.status(status).body(standardError);
     }
+
+    @ExceptionHandler(TipoPeriodoEPagamentoDivergentesException.class)
+    public ResponseEntity<StandardError> periodoEPagamentoDivergentes(TipoPeriodoEPagamentoDivergentesException e,
+                                                                      HttpServletRequest request){
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        StandardError standardError = StandardError.builder()
+                .timestamp(Instant.now())
+                .status(status.value())
+                .error("Tipo de Periodo e Forma de Pagamento são divergentes!")
+                .message(e.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(status).body(standardError);
+
+    }
+
+    @ExceptionHandler(CampoVazioException.class)
+    public ResponseEntity<StandardError> campoVazio(CampoVazioException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        StandardError standardError = StandardError.builder()
+                .timestamp(Instant.now())
+                .status(status.value())
+                .error("Campo vazio!")
+                .message(e.getMessage())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(status).body(standardError);
+    }
 }

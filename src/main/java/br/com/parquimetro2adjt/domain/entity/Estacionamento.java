@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Estacionamento {
     @Id
-    private ObjectId id;
+    private String id;
     private TipoEstacionamentoEnum tipoEstacionamento;
     private Integer duracaoDesejada;
     private LocalDateTime horaInicial;
