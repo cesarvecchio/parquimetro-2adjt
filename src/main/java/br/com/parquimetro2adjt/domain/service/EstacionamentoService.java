@@ -8,12 +8,11 @@ import br.com.parquimetro2adjt.application.request.EstacionamentoRequestDTO;
 import br.com.parquimetro2adjt.application.response.EstacionamentoResponseDTO;
 import br.com.parquimetro2adjt.domain.entity.Condutor;
 import br.com.parquimetro2adjt.domain.entity.Estacionamento;
-import br.com.parquimetro2adjt.domain.entity.Veiculo;
 import br.com.parquimetro2adjt.domain.enums.PagamentoEnum;
 import br.com.parquimetro2adjt.domain.enums.TipoEstacionamentoEnum;
 import br.com.parquimetro2adjt.infra.repository.CondutorRepository;
 import br.com.parquimetro2adjt.infra.repository.EstacionamentoRepository;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -28,25 +27,29 @@ public class EstacionamentoService {
     private CondutorRepository condutorRepository;//TODO: mudar para service
     private VeiculoService2 veiculoService;
 
+    private PagamentoService pagamentoService;
+
+    @Autowired
     public EstacionamentoService(EstacionamentoRepository estacionamentoRepository, CondutorService condutorService,
-                                 CondutorRepository condutorRepository, VeiculoService2 veiculoService) {
+                                 CondutorRepository condutorRepository, VeiculoService2 veiculoService, PagamentoService pagamentoService) {
         this.estacionamentoRepository = estacionamentoRepository;
         this.condutorService = condutorService;
         this.condutorRepository = condutorRepository;
         this.veiculoService = veiculoService;
+        this.pagamentoService = pagamentoService;
     }
 
     public EstacionamentoResponseDTO create(String placa, EstacionamentoRequestDTO requestDTO) {
         Optional<Condutor> condutorOpt = condutorRepository.findVeiculoPorPlaca(placa);
 
-        if(condutorOpt.isEmpty()) {
+        if (condutorOpt.isEmpty()) {
             throw new NaoEncontradoException(
                     String.format("O veiculo com a placa '%s' não foi encontrado!", placa));
         }
 
         Optional<Estacionamento> estacionamentoOpt = estacionamentoRepository.buscarEstacionamentoAtivoPorPlaca(placa);
 
-        if(estacionamentoOpt.isPresent()){
+        if (estacionamentoOpt.isPresent()) {
             throw new CadastradoException(
                     String.format("O veiculo com a placa '%s' já possui um registro de estacionamento ativo!", placa));
         }
@@ -65,21 +68,21 @@ public class EstacionamentoService {
         return toResponse(estacionamentoRepository.save(estacionamento));
     }
 
-    public EstacionamentoResponseDTO finalizarEstacionamento(){
+    public EstacionamentoResponseDTO finalizarEstacionamento() {
         return null;
     }
 
     public void validarPeriodoEPagamento(TipoEstacionamentoEnum tipoEstacionamentoEnum, PagamentoEnum pagamentoEnum) {
-        if(TipoEstacionamentoEnum.VARIAVEL.equals(tipoEstacionamentoEnum)
+        if (TipoEstacionamentoEnum.VARIAVEL.equals(tipoEstacionamentoEnum)
                 && PagamentoEnum.PIX.equals(pagamentoEnum)) {
             throw new TipoPeriodoEPagamentoDivergentesException(
                     "A opção PIX só está disponível para períodos de estacionamento fixos!");
         }
     }
 
-    public void validarPeriodoFixo(EstacionamentoRequestDTO requestDTO){
-        if(TipoEstacionamentoEnum.FIXO.equals(requestDTO.tipoEstacionamento())
-        && ObjectUtils.isEmpty(requestDTO.duracaoDesejada())) {
+    public void validarPeriodoFixo(EstacionamentoRequestDTO requestDTO) {
+        if (TipoEstacionamentoEnum.FIXO.equals(requestDTO.tipoEstacionamento())
+                && ObjectUtils.isEmpty(requestDTO.duracaoDesejada())) {
             throw new CampoVazioException(
                     String.format("Para periodos '%s' o sistema requer que o campo '%s'! seja informado",
                             requestDTO.tipoEstacionamento(), "duracaoDesejada"));
@@ -89,7 +92,7 @@ public class EstacionamentoService {
     public List<EstacionamentoResponseDTO> buscarTodosEstacionamentoPorPlaca(String placa) {
         List<Estacionamento> estacionamentoList = estacionamentoRepository.buscarTodosEstacionamentoPorPlaca(placa);
 
-        if(estacionamentoList.isEmpty()) {
+        if (estacionamentoList.isEmpty()) {
             throw new NaoEncontradoException("Este veiculo não possui nenhum registro de estacionamento!");
         }
 
@@ -107,7 +110,7 @@ public class EstacionamentoService {
     public EstacionamentoResponseDTO finalizar(String placa) {
         Optional<Estacionamento> estacionamentoOpt = estacionamentoRepository.buscarEstacionamentoAtivoPorPlaca(placa);
 
-        if(estacionamentoOpt.isEmpty()){
+        if (estacionamentoOpt.isEmpty()) {
             throw new NaoEncontradoException(
                     String.format("O Veiculo com a placa '%s' não possui nenhum registro de estacionamento ativo!",
                             placa));
@@ -115,6 +118,7 @@ public class EstacionamentoService {
 
         Estacionamento estacionamento = estacionamentoOpt.get();
         estacionamento.setHoraFinal(LocalDateTime.now());
+        estacionamento.setValorCobrado(pagamentoService.calcularValorPagamento(estacionamento));
 
         return toResponse(estacionamentoRepository.save(estacionamento));
     }
@@ -131,7 +135,7 @@ public class EstacionamentoService {
     public List<EstacionamentoResponseDTO> buscarEstacionamentosAtivos() {
         List<Estacionamento> estacionamentoList = estacionamentoRepository.buscarEstacionamentosAtivos();
 
-        if(estacionamentoList.isEmpty()) {
+        if (estacionamentoList.isEmpty()) {
             throw new NaoEncontradoException("Não possui nenhum veliculo com registro de estacionamento ativo");
         }
 
@@ -154,7 +158,8 @@ public class EstacionamentoService {
                 estacionamento.getDuracaoDesejada(),
                 estacionamento.getHoraInicial(),
                 estacionamento.getHoraFinal(),
-                estacionamento.getVeiculo()
+                estacionamento.getVeiculo(),
+                estacionamento.getValorCobrado()
         );
     }
 
