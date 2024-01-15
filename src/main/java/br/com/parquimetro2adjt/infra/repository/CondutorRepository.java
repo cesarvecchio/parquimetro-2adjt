@@ -18,9 +18,6 @@ public interface CondutorRepository extends MongoRepository<Condutor, String> {
 
     //Metodos do veiculos
 
-    @Query("{ 'veiculos' : { $elemMatch : { placa : 'BRA2E19' } } }")
-    Boolean existsVeiculoPorPlaca(String id);
-
     @Query("{ 'veiculos' : { $elemMatch : { placa : ?0 } } }")
     Optional<Condutor> findVeiculoPorPlaca(String id);
 }

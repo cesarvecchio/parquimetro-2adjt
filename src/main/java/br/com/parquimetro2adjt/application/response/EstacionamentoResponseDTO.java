@@ -11,6 +11,7 @@ public record EstacionamentoResponseDTO (
         Integer duracaoDesejada,
         LocalDateTime horaInicial,
         LocalDateTime horaFinal,
-        Veiculo veiculo
+        Veiculo veiculo,
+        Double valorCobrado
 ){
 }
