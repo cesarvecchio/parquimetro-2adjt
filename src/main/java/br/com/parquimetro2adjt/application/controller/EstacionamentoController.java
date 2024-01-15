@@ -1,5 +1,6 @@
 package br.com.parquimetro2adjt.application.controller;
 
+import br.com.parquimetro2adjt.application.documentation.EstacionamentoDocController;
 import br.com.parquimetro2adjt.application.request.EstacionamentoRequestDTO;
 import br.com.parquimetro2adjt.application.response.EstacionamentoResponseDTO;
 import br.com.parquimetro2adjt.domain.service.EstacionamentoService;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/estacionamentos")
-public class EstacionamentoController {
+public class EstacionamentoController implements EstacionamentoDocController<EstacionamentoResponseDTO> {
 
     private EstacionamentoService estacionamentoService;
 
@@ -19,7 +20,7 @@ public class EstacionamentoController {
     }
 
     @PostMapping("/{placa}")
-    public ResponseEntity<EstacionamentoResponseDTO> create(@PathVariable String placa, @RequestBody EstacionamentoRequestDTO requestDTO){
+    public ResponseEntity<EstacionamentoResponseDTO> create(@PathVariable String placa, @RequestBody EstacionamentoRequestDTO requestDTO) {
         return ResponseEntity.ok(estacionamentoService.create(placa, requestDTO));
     }
 
@@ -39,7 +40,7 @@ public class EstacionamentoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EstacionamentoResponseDTO>> buscarEstacionamentosAtivos(){
+    public ResponseEntity<List<EstacionamentoResponseDTO>> buscarEstacionamentosAtivos() {
         return ResponseEntity.ok(estacionamentoService.buscarEstacionamentosAtivos());
     }
 
