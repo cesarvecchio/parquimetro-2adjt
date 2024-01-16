@@ -125,7 +125,6 @@ public class VeiculoService {
 
     public Veiculo toEntity(VeiculoRequestDTO veiculoRequestDTO) {
         return Veiculo.builder()
-                .id(veiculoRequestDTO.id())
                 .marca(veiculoRequestDTO.marca())
                 .modelo(veiculoRequestDTO.modelo())
                 .cor(veiculoRequestDTO.cor())

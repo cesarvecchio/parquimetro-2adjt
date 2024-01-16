@@ -25,13 +25,13 @@ public class EstacionamentoService {
     private EstacionamentoRepository estacionamentoRepository;
     private CondutorService condutorService;
     private CondutorRepository condutorRepository;//TODO: mudar para service
-    private VeiculoService2 veiculoService;
+    private VeiculoService veiculoService;
 
     private PagamentoService pagamentoService;
 
     @Autowired
     public EstacionamentoService(EstacionamentoRepository estacionamentoRepository, CondutorService condutorService,
-                                 CondutorRepository condutorRepository, VeiculoService2 veiculoService, PagamentoService pagamentoService) {
+                                 CondutorRepository condutorRepository, VeiculoService veiculoService, PagamentoService pagamentoService) {
         this.estacionamentoRepository = estacionamentoRepository;
         this.condutorService = condutorService;
         this.condutorRepository = condutorRepository;
