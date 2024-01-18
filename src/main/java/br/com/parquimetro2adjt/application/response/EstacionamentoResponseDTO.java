@@ -11,6 +11,9 @@ public record EstacionamentoResponseDTO (
         Integer duracaoDesejada,
         LocalDateTime horaInicial,
         LocalDateTime horaFinal,
-        Veiculo veiculo
+        Veiculo veiculo,
+        String nome,
+        String email,
+        LocalDateTime dataHoraUltimoAlerta
 ){
 }

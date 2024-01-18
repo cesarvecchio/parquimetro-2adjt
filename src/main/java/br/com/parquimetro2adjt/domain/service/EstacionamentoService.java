@@ -61,6 +61,8 @@ public class EstacionamentoService {
         estacionamento.setHoraInicial(LocalDateTime.now());
         estacionamento.setVeiculo(condutor.getVeiculos().stream()
                 .filter(veiculo -> veiculo.getPlaca().equals(placa)).findFirst().get());
+        estacionamento.setNome(condutor.getNome());
+        estacionamento.setEmail(condutor.getEmail());
 
         return toResponse(estacionamentoRepository.save(estacionamento));
     }
@@ -154,7 +156,10 @@ public class EstacionamentoService {
                 estacionamento.getDuracaoDesejada(),
                 estacionamento.getHoraInicial(),
                 estacionamento.getHoraFinal(),
-                estacionamento.getVeiculo()
+                estacionamento.getVeiculo(),
+                estacionamento.getNome(),
+                estacionamento.getEmail(),
+                estacionamento.getDataHoraUltimoAlerta()
         );
     }
 
