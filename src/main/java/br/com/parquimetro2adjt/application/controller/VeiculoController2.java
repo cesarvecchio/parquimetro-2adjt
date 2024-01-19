@@ -1,10 +1,8 @@
 package br.com.parquimetro2adjt.application.controller;
 
+import br.com.parquimetro2adjt.application.documentation.VeiculoDocController;
 import br.com.parquimetro2adjt.application.request.VeiculoRequestDTO;
-import br.com.parquimetro2adjt.application.response.VeiculoResponseDTO;
 import br.com.parquimetro2adjt.application.response.VeiculoResponseDTO2;
-import br.com.parquimetro2adjt.domain.entity.Condutor;
-import br.com.parquimetro2adjt.domain.entity.Veiculo;
 import br.com.parquimetro2adjt.domain.service.VeiculoService2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/veiculos2")
-public class VeiculoController2 {
+public class VeiculoController2 implements VeiculoDocController<VeiculoResponseDTO2> {
 
     private final VeiculoService2 veiculoService;
 

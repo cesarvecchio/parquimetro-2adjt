@@ -4,7 +4,7 @@ import br.com.parquimetro2adjt.domain.enums.TipoEstacionamentoEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 public class Estacionamento {
     @Id
     private String id;
@@ -23,4 +24,5 @@ public class Estacionamento {
     private String nome;
     private String email;
     private LocalDateTime dataHoraUltimoAlerta;
+    private Double valorCobrado;
 }

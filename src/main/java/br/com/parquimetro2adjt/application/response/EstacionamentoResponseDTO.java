@@ -14,6 +14,7 @@ public record EstacionamentoResponseDTO (
         Veiculo veiculo,
         String nome,
         String email,
-        LocalDateTime dataHoraUltimoAlerta
+        LocalDateTime dataHoraUltimoAlerta,
+        Double valorCobrado
 ){
 }
