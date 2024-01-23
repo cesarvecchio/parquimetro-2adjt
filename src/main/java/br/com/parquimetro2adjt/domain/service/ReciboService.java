@@ -19,18 +19,29 @@ public class ReciboService {
     public String gerarRecibo(String placa){
         Optional<Estacionamento> optional = estacionamentoRepository.buscarEstacionamentoFinalizadoPorPlaca(placa);
 
-        String recibo = String.format(
-            "--------------------------------- \n"
-            + "Tipo do Estacionamento: %s \n"
-            + "Duração Desejada: %d \n"
-            + "Hora Inicial: %s \n"
-            + "Hora Final: %s\n "
-            + "---------------------------------",
-            TipoEstacionamentoEnum.VARIAVEL,
-            100,
-            LocalDateTime.now(),
-            LocalDateTime.now());
+        if (optional.isPresent()) {
+            Estacionamento estacionamento = optional.get();
 
-        return recibo;
+            return String.format(
+                    "Recibo do Estacionamento \n"
+                            + "------------------------ \n"
+                            + "Tipo do Estacionamento: %s \n"
+                            + "Duração Desejada: %d \n"
+                            + "Hora Inicial: %s \n"
+                            + "Hora Final: %s\n "
+                            + "Forma de Pagamento: %s\n "
+                            + "Valor: %s\n "
+                            + "Hora Final: %s\n "
+                            + "------------------------ ",
+                    estacionamento.getTipoEstacionamento(),
+                    estacionamento.getDuracaoDesejada(),
+                    estacionamento.getHoraInicial(),
+                    estacionamento.getHoraFinal(),
+                    estacionamento.getValorCobrado(),
+                    LocalDateTime.now()
+            );
+        } else {
+            return "Nenhum estacionamento finalizado encontrado para a placa: " + placa;
+        }
     }
 }
