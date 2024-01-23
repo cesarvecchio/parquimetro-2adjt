@@ -14,7 +14,6 @@ public record CondutorResponseDTO(
         String cpf,
         PagamentoEnum formaPagamento,
         Endereco endereco,
-
         List<Veiculo> veiculos
 ) {
 }

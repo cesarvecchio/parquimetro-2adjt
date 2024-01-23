@@ -1,142 +1,134 @@
 package br.com.parquimetro2adjt.domain.service;
 
+import br.com.parquimetro2adjt.application.controller.exceptions.CadastradoException;
 import br.com.parquimetro2adjt.application.controller.exceptions.NaoEncontradoException;
-import br.com.parquimetro2adjt.application.controller.exceptions.VeiculoNaoPertenceAoCondutorException;
 import br.com.parquimetro2adjt.application.request.VeiculoRequestDTO;
-import br.com.parquimetro2adjt.application.response.CondutorResponseDTO;
 import br.com.parquimetro2adjt.application.response.VeiculoResponseDTO;
 import br.com.parquimetro2adjt.domain.entity.Condutor;
 import br.com.parquimetro2adjt.domain.entity.Veiculo;
-import br.com.parquimetro2adjt.infra.repository.VeiculoRepository;
+import br.com.parquimetro2adjt.infra.repository.CondutorRepository;
 import br.com.parquimetro2adjt.utils.Utils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.util.ObjectUtils.isEmpty;
 
 @Service
 public class VeiculoService {
-    private final VeiculoRepository veiculoRepository;
     private final CondutorService condutorService;
+    private final CondutorRepository condutorRepository;
     private final Utils utils;
 
-    public VeiculoService(VeiculoRepository veiculoRepository, CondutorService condutorService, Utils utils) {
-        this.veiculoRepository = veiculoRepository;
+    public VeiculoService(CondutorService condutorService, CondutorRepository condutorRepository, Utils utils) {
         this.condutorService = condutorService;
+        this.condutorRepository = condutorRepository;
         this.utils = utils;
     }
 
-    public Page<VeiculoResponseDTO> findAll(Pageable pageable,
-                                            String placa,
-                                            String modelo,
-                                            String cor,
-                                            String marca,
-                                            Condutor condutor) {
-        Example<Veiculo> example = Example.of(Veiculo.builder()
-                .placa(placa)
-                .modelo(modelo)
-                .cor(cor)
-                .marca(marca)
-                .condutor(condutor)
-                .build()
-        );
+    public VeiculoResponseDTO buscar(String placa){
+        Optional<Condutor> condutorOpt = condutorRepository.findVeiculoPorPlaca(placa);
 
-        Page<Veiculo> veiculos = veiculoRepository.findAll(example, pageable);
-        return veiculos.map(this::toResponseDTO);
-    }
-
-    public VeiculoResponseDTO cadastrar(VeiculoRequestDTO veiculoRequestDTO, String idCondutor) {
-        Veiculo veiculo = toEntity(veiculoRequestDTO);
-        veiculo.setCondutor(condutorService.buscaPorId(idCondutor));
-
-        /* VERIFICAR SE É A MANEIRA CORRETA DE VINCULAR O VEICULO AO CONDUTOR
-        Condutor condutor = condutorService.buscaPorId(idCondutor);
-        condutor.getVeiculos().add(veiculo);*/
-
-        return toResponseDTO(veiculoRepository.save(veiculo));
-    }
-
-    public VeiculoResponseDTO atualizar(String idCondutor, String idVeiculo, VeiculoRequestDTO veiculoRequestDTO) {
-        Condutor condutor = condutorService.buscaPorId(idCondutor);
-        Veiculo request = toEntity(veiculoRequestDTO);
-
-        Veiculo veiculo = buscarPorId(idVeiculo);
-
-        if (!veiculoPertenceAoCondutor(veiculo, condutor))
-            throw new VeiculoNaoPertenceAoCondutorException(
-                    String.format("O veiculo com o id '%d' não pertence ao condutor com id '%d'!",
-                            idVeiculo, idCondutor));
-
-        utils.copyNonNullProperties(request, veiculo);
-
-        return toResponseDTO(veiculoRepository.save(veiculo));
-    }
-
-    public void deletar(String idCondutor, String idVeiculo) {
-        condutorService.existePorId(idCondutor);
-        existePorId(idVeiculo);
-
-        if (!veiculoPertenceAoCondutor(idVeiculo, idCondutor))
-            throw new VeiculoNaoPertenceAoCondutorException(
-                String.format("O veiculo com o id '%d' não pertence ao condutor com id '%d'!",
-                        idVeiculo, idCondutor));
-
-        veiculoRepository.deleteById(idVeiculo);
-
-    }
-
-    public Veiculo buscarPorId(String idVeiculo) {
-        return veiculoRepository.findById(idVeiculo)
-                .orElseThrow(() -> new NaoEncontradoException(
-                        String.format("Veiculo com o id '%d' não encontrado", idVeiculo)));
-    }
-
-    public Page<VeiculoResponseDTO> consultarVeiculosPorCondutor(String idCondutor, Pageable pageable) {
-        condutorService.existePorId(idCondutor);
-        Page<Veiculo> veiculos = veiculoRepository.findAllByCondutorId(idCondutor, pageable);
-
-        return veiculos.map(this::toResponseDTO);
-    }
-
-    public void existePorId(String idVeiculo) {
-        if (!veiculoRepository.existsById(idVeiculo))
+        if(condutorOpt.isEmpty()) {
             throw new NaoEncontradoException(
-                    String.format("Veiculo com o id '%d' não encontrado", idVeiculo));
+                    String.format("O veiculo com a placa '%s' não foi encontrado!", placa));
+        }
+        Condutor condutor = condutorOpt.get();
+
+        return toResponseDTO(condutor.getVeiculos().stream()
+                .filter(veiculo -> veiculo.getPlaca().equals(placa)).findFirst().get());
     }
 
-    public boolean veiculoPertenceAoCondutor(Veiculo veiculo, Condutor condutor) {
-        return ObjectUtils.nullSafeEquals(veiculo.getCondutor().getId(), condutor.getId());
+    public List<VeiculoResponseDTO> findAllByCondutor(String id){
+        Condutor condutor = condutorService.buscaPorId(id);
+
+        if(ObjectUtils.isEmpty(condutor.getVeiculos()) || condutor.getVeiculos().isEmpty()) {
+            throw new NaoEncontradoException(
+                    String.format("O Condutor com id '%s' não possui veiculos cadatrados!", id));
+        }
+
+        return condutor.getVeiculos().stream().map(this::toResponseDTO).toList();
     }
 
-    public boolean veiculoPertenceAoCondutor(String veiculoId, String condutorId) {
-        return veiculoRepository.existsVeiculoByIdAndCondutorId(veiculoId, condutorId);
+    public VeiculoResponseDTO cadastrar(String idCondutor, VeiculoRequestDTO requestDTO) {
+
+        if(condutorRepository.findVeiculoPorPlaca(requestDTO.placa()).isPresent()){
+            throw new CadastradoException(String.format(
+                    "O veiculo com a placa '%s' já está cadastrado no sistema!",
+                    requestDTO.placa()));
+        }
+
+        Condutor condutor = this.condutorService.buscaPorId(idCondutor);
+
+        List<Veiculo> listaVeiculos = new ArrayList<>(ObjectUtils.isEmpty(condutor.getVeiculos())
+                ? new ArrayList<>() : condutor.getVeiculos());
+        listaVeiculos.add(toEntity(requestDTO));
+
+        condutor.setVeiculos(listaVeiculos);
+
+        condutor = condutorRepository.save(condutor);
+
+        return toResponseDTO(condutor.getVeiculos().stream()
+                .filter(veiculo -> veiculo.getPlaca().equals(requestDTO.placa()))
+                .findFirst().get());
+    }
+
+    public VeiculoResponseDTO atualizar(String placa, VeiculoRequestDTO requestDTO) {
+        Optional<Condutor> condutorOpt = condutorRepository.findVeiculoPorPlaca(placa);
+
+        if(condutorOpt.isEmpty()) {
+            throw new NaoEncontradoException(
+                    String.format("O veiculo com a placa '%s' não foi encontrado!", placa));
+        }
+
+        Condutor condutor = condutorOpt.get();
+
+        condutor.getVeiculos().stream().forEach(veiculo -> {
+            if(veiculo.getPlaca().equals(placa)){
+                utils.copyNonNullProperties(requestDTO, veiculo);
+                return;
+            }
+        });
+
+        condutor = condutorRepository.save(condutor);
+
+        return toResponseDTO(condutor.getVeiculos().stream()
+                .filter(veiculo -> veiculo.getPlaca().equals(placa))
+                .findFirst().get());
+    }
+
+    public void deletar(String placa) {
+        Optional<Condutor> condutorOpt = condutorRepository.findVeiculoPorPlaca(placa);
+
+        if(condutorOpt.isEmpty()) {
+            throw new NaoEncontradoException(
+                    String.format("O veiculo com a placa '%s' não foi encontrado!", placa));
+        }
+        Condutor condutor = condutorOpt.get();
+
+        condutor.getVeiculos().removeIf(veiculo -> veiculo.getPlaca().equals(placa));
+
+        condutorRepository.save(condutor);
     }
 
     public VeiculoResponseDTO toResponseDTO(Veiculo veiculo) {
         return new VeiculoResponseDTO(
-                veiculo.getId(),
                 veiculo.getModelo(),
                 veiculo.getPlaca(),
                 veiculo.getMarca(),
-                veiculo.getCor(),
-                isEmpty(veiculo.getCondutor()) ? null : condutorService.toResponseDto(veiculo.getCondutor())
+                veiculo.getCor()
         );
     }
 
     public Veiculo toEntity(VeiculoRequestDTO veiculoRequestDTO) {
         return Veiculo.builder()
-                .id(veiculoRequestDTO.id())
                 .marca(veiculoRequestDTO.marca())
                 .modelo(veiculoRequestDTO.modelo())
                 .cor(veiculoRequestDTO.cor())
                 .placa(veiculoRequestDTO.placa())
-                .condutor(isEmpty(veiculoRequestDTO.condutorRequestDTO()) ? null : condutorService.toEntity(veiculoRequestDTO.condutorRequestDTO()))
                 .build();
     }
 }

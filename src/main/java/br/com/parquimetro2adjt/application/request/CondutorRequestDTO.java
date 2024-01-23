@@ -8,12 +8,8 @@ public record CondutorRequestDTO(
         String id,
         String nome,
         String email,
-
         String cpf,
-
         String senha,
-
-        PagamentoEnum formaPagamento,
         Endereco endereco
 ) {
 }
