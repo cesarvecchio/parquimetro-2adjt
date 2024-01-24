@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/{idCondutor}/formaPagamento/{formaPagamento}")
 public class FormaPagamentoController {
 
-    @Autowired
     private final FormaPagamentoService formaPagamentoService;
 
     public FormaPagamentoController(FormaPagamentoService formaPagamentoService) {

@@ -22,20 +22,14 @@ import java.util.Optional;
 
 @Service
 public class EstacionamentoService {
-    private EstacionamentoRepository estacionamentoRepository;
-    private CondutorService condutorService;
-    private CondutorRepository condutorRepository;//TODO: mudar para service
-    private VeiculoService veiculoService;
+    private final EstacionamentoRepository estacionamentoRepository;
+    private final CondutorRepository condutorRepository;
+    private final PagamentoService pagamentoService;
 
-    private PagamentoService pagamentoService;
-
-    @Autowired
-    public EstacionamentoService(EstacionamentoRepository estacionamentoRepository, CondutorService condutorService,
-                                 CondutorRepository condutorRepository, VeiculoService veiculoService, PagamentoService pagamentoService) {
+    public EstacionamentoService(EstacionamentoRepository estacionamentoRepository, CondutorRepository condutorRepository,
+                                 PagamentoService pagamentoService) {
         this.estacionamentoRepository = estacionamentoRepository;
-        this.condutorService = condutorService;
         this.condutorRepository = condutorRepository;
-        this.veiculoService = veiculoService;
         this.pagamentoService = pagamentoService;
     }
 

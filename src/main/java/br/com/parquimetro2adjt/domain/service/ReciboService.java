@@ -1,7 +1,6 @@
 package br.com.parquimetro2adjt.domain.service;
 
 import br.com.parquimetro2adjt.domain.entity.Estacionamento;
-import br.com.parquimetro2adjt.domain.enums.TipoEstacionamentoEnum;
 import br.com.parquimetro2adjt.infra.repository.EstacionamentoRepository;
 import org.springframework.stereotype.Service;
 

@@ -4,14 +4,12 @@ import br.com.parquimetro2adjt.application.controller.exceptions.CpfException;
 import br.com.parquimetro2adjt.application.controller.exceptions.NaoEncontradoException;
 import br.com.parquimetro2adjt.application.request.CondutorRequestDTO;
 import br.com.parquimetro2adjt.application.response.CondutorResponseDTO;
-import br.com.parquimetro2adjt.application.response.VeiculoResponseDTO;
 import br.com.parquimetro2adjt.domain.entity.Condutor;
 import br.com.parquimetro2adjt.domain.entity.Veiculo;
 import br.com.parquimetro2adjt.domain.enums.PagamentoEnum;
 import br.com.parquimetro2adjt.domain.valueObject.Endereco;
 import br.com.parquimetro2adjt.infra.repository.CondutorRepository;
 import br.com.parquimetro2adjt.utils.Utils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,8 +19,7 @@ import java.util.List;
 
 @Service
 public class CondutorService {
-    @Autowired
-    private CondutorRepository condutorRepository;
+    private final CondutorRepository condutorRepository;
     private final Utils utils;
 
     public CondutorService(CondutorRepository condutorRepository, Utils utils) {
@@ -56,7 +53,7 @@ public class CondutorService {
     public Condutor buscaPorId(String idCondutor) {
         return condutorRepository.findById(idCondutor)
                 .orElseThrow(() -> new NaoEncontradoException(
-                        String.format("Condutor com o id '%d' não encontrado", idCondutor)));
+                        String.format("Condutor com o id '%s' não encontrado", idCondutor)));
     }
 
     public Page<CondutorResponseDTO> findAll(Pageable pageable,
@@ -87,7 +84,7 @@ public class CondutorService {
     public void existePorId(String idCondutor) {
         if (!condutorRepository.existsById(idCondutor))
             throw new NaoEncontradoException(
-                    String.format("Condutor com o id '%d' não encontrado", idCondutor));
+                    String.format("Condutor com o id '%s' não encontrado", idCondutor));
 
     }
 

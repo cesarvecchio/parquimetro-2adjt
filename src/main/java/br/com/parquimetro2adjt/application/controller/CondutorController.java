@@ -7,7 +7,6 @@ import br.com.parquimetro2adjt.domain.entity.Veiculo;
 import br.com.parquimetro2adjt.domain.enums.PagamentoEnum;
 import br.com.parquimetro2adjt.domain.service.CondutorService;
 import br.com.parquimetro2adjt.domain.valueObject.Endereco;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -20,8 +19,11 @@ import java.util.List;
 @RequestMapping("/condutores")
 public class CondutorController implements CondutorDocController<CondutorResponseDTO> {
 
-    @Autowired
-    private CondutorService condutorService;
+    private final CondutorService condutorService;
+
+    public CondutorController(CondutorService condutorService) {
+        this.condutorService = condutorService;
+    }
 
     @PostMapping
     public ResponseEntity<CondutorResponseDTO> cadastrar(@RequestBody CondutorRequestDTO condutorDTO) {

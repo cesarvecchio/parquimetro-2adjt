@@ -19,6 +19,7 @@ import static org.springframework.util.ObjectUtils.isEmpty;
 
 @Service
 public class VeiculoService {
+    private static final String VEICULO_NAO_ENCONTRADO = "O veiculo com a placa '%s' não foi encontrado!";
     private final CondutorService condutorService;
     private final CondutorRepository condutorRepository;
     private final Utils utils;
@@ -34,7 +35,7 @@ public class VeiculoService {
 
         if(condutorOpt.isEmpty()) {
             throw new NaoEncontradoException(
-                    String.format("O veiculo com a placa '%s' não foi encontrado!", placa));
+                    String.format(VEICULO_NAO_ENCONTRADO, placa));
         }
         Condutor condutor = condutorOpt.get();
 
@@ -81,12 +82,12 @@ public class VeiculoService {
 
         if(condutorOpt.isEmpty()) {
             throw new NaoEncontradoException(
-                    String.format("O veiculo com a placa '%s' não foi encontrado!", placa));
+                    String.format(VEICULO_NAO_ENCONTRADO, placa));
         }
 
         Condutor condutor = condutorOpt.get();
 
-        condutor.getVeiculos().stream().forEach(veiculo -> {
+        condutor.getVeiculos().forEach(veiculo -> {
             if(veiculo.getPlaca().equals(placa)){
                 utils.copyNonNullProperties(requestDTO, veiculo);
                 return;
@@ -105,7 +106,7 @@ public class VeiculoService {
 
         if(condutorOpt.isEmpty()) {
             throw new NaoEncontradoException(
-                    String.format("O veiculo com a placa '%s' não foi encontrado!", placa));
+                    String.format(VEICULO_NAO_ENCONTRADO, placa));
         }
         Condutor condutor = condutorOpt.get();
 

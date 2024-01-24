@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @RequestMapping("/recibos")
 public class ReciboController {
 
-    private ReciboService reciboService;
+    private final ReciboService reciboService;
 
     public ReciboController(ReciboService reciboService) {
         this.reciboService = reciboService;

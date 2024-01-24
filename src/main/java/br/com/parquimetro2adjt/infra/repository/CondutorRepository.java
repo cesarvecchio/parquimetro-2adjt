@@ -1,12 +1,9 @@
 package br.com.parquimetro2adjt.infra.repository;
 
 import br.com.parquimetro2adjt.domain.entity.Condutor;
-import br.com.parquimetro2adjt.domain.entity.Veiculo;
-import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface CondutorRepository extends MongoRepository<Condutor, String> {
