@@ -4,6 +4,10 @@ import br.com.parquimetro2adjt.domain.entity.Estacionamento;
 import br.com.parquimetro2adjt.infra.repository.EstacionamentoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -14,15 +18,28 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
 public class AlertaService {
 
     Logger logger = LoggerFactory.getLogger(AlertaService.class);
+
     EstacionamentoRepository estacionamentoRepository;
 
     private static final String ZONE_ID_SAO_PAULO = "America/Sao_Paulo";
+
+    @Value("${quantidade.threads}")
+    private int qtThreads;
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    private ExecutorService executorService() {
+        return Executors.newFixedThreadPool(qtThreads);
+    }
 
     public AlertaService(EstacionamentoRepository estacionamentoRepository) {
         this.estacionamentoRepository = estacionamentoRepository;
@@ -39,25 +56,28 @@ public class AlertaService {
         List<Estacionamento> registrosAlertados = new ArrayList<>();
 
         for (Estacionamento registro : registrosSemHorarioSaida) {
-            ZonedDateTime dataLimite = registro.getHoraInicial()
-                    .atZone(ZoneId.of(ZONE_ID_SAO_PAULO))
-                    .plusHours(registro.getDuracaoDesejada());
-            ZonedDateTime dataInicioAlerta = dataLimite.minusMinutes(minutosAntesDeFecharHoraLimiteParaAlertar);
-            if (dataAtual.isAfter(dataInicioAlerta) && dataAtual.isBefore(dataLimite)) {
-                String msgEmail = String.format("**** ENVIANDO E-MAIL PARA ALERTAR SOBRE TEMPO RESTANTE DE ESTACIONAMENTO PERÍODO FIXO ****%n");
-                msgEmail += String.format("Destinatário: %s%n", registro.getEmail());
-                msgEmail += String.format("Assunto: Tempo Restante Estacionamento%n");
-                msgEmail += String.format("Corpo: Caro(a) %s, o seu veículo de placa %s tem aproximadamente %d minutos restantes para " +
-                                "permanecer estacionado!! Favor registrar saída até a data limite de: %s.%n",
-                        registro.getNome(),
-                        registro.getVeiculo().getPlaca(),
-                        minutosAntesDeFecharHoraLimiteParaAlertar,
-                        dataLimite.format(formatter));
-                registro.setDataHoraUltimoAlerta(LocalDateTime.now());
-                registrosAlertados.add(registro);
-                logger.info(msgEmail);
-            }
+            executorService().execute(() -> {
+                ZonedDateTime dataLimite = registro.getHoraInicial()
+                        .atZone(ZoneId.of(ZONE_ID_SAO_PAULO))
+                        .plusHours(registro.getDuracaoDesejada());
+                ZonedDateTime dataInicioAlerta = dataLimite.minusMinutes(minutosAntesDeFecharHoraLimiteParaAlertar);
+                if (dataAtual.isAfter(dataInicioAlerta) && dataAtual.isBefore(dataLimite)) {
+                    String msgEmail = String.format("**** ENVIANDO E-MAIL PARA ALERTAR SOBRE TEMPO RESTANTE DE ESTACIONAMENTO PERÍODO FIXO ****%n");
+                    msgEmail += String.format("Destinatário: %s%n", registro.getEmail());
+                    msgEmail += String.format("Assunto: Tempo Restante Estacionamento%n");
+                    msgEmail += String.format("Corpo: Caro(a) %s, o seu veículo de placa %s tem aproximadamente %d minutos restantes para " +
+                                    "permanecer estacionado!! Favor registrar saída até a data limite de: %s.%n",
+                            registro.getNome(),
+                            registro.getVeiculo().getPlaca(),
+                            minutosAntesDeFecharHoraLimiteParaAlertar,
+                            dataLimite.format(formatter));
+                    registro.setDataHoraUltimoAlerta(LocalDateTime.now());
+                    registrosAlertados.add(registro);
+                    logger.info(msgEmail);
+                }
+            });
         }
+        shutdownExecutor();
         estacionamentoRepository.saveAll(registrosAlertados);
     }
 
@@ -72,24 +92,27 @@ public class AlertaService {
         List<Estacionamento> registrosAlertados = new ArrayList<>();
 
         for (Estacionamento registro : registrosSemHorarioSaida) {
-            ZonedDateTime dataLimite = getDataLimite(registro);
-            ZonedDateTime dataInicioAlerta = dataLimite.minusMinutes(minutosAntesDeFecharHoraLimiteParaAlertar);
-            if (dataAtual.isAfter(dataInicioAlerta) && dataAtual.isBefore(dataLimite)) {
-                String msgEmail = String.format("**** ENVIANDO E-MAIL PARA ALERTAR SOBRE TEMPO RESTANTE DE ESTACIONAMENTO PERÍODO VARIÁVEL ****%n");
-                msgEmail += String.format("Destinatário: %s%n", registro.getEmail());
-                msgEmail += String.format("Assunto: Tempo Restante Estacionamento%n");
-                msgEmail += String.format("Corpo: Caro(a) %s, o seu veículo de placa %s tem aproximadamente %d minutos restantes para " +
-                                "permanecer estacionado!! Caso não registre saída até a data limite de: %s. será incrementado automaticamente " +
-                                "1 hora no período estacionado!%n",
-                        registro.getNome(),
-                        registro.getVeiculo().getPlaca(),
-                        minutosAntesDeFecharHoraLimiteParaAlertar,
-                        dataLimite.format(formatter));
-                registro.setDataHoraUltimoAlerta(LocalDateTime.now());
-                registrosAlertados.add(registro);
-                logger.info(msgEmail);
-            }
+            executorService().execute(() -> {
+                ZonedDateTime dataLimite = getDataLimite(registro);
+                ZonedDateTime dataInicioAlerta = dataLimite.minusMinutes(minutosAntesDeFecharHoraLimiteParaAlertar);
+                if (dataAtual.isAfter(dataInicioAlerta) && dataAtual.isBefore(dataLimite)) {
+                    String msgEmail = String.format("**** ENVIANDO E-MAIL PARA ALERTAR SOBRE TEMPO RESTANTE DE ESTACIONAMENTO PERÍODO VARIÁVEL ****%n");
+                    msgEmail += String.format("Destinatário: %s%n", registro.getEmail());
+                    msgEmail += String.format("Assunto: Tempo Restante Estacionamento%n");
+                    msgEmail += String.format("Corpo: Caro(a) %s, o seu veículo de placa %s tem aproximadamente %d minutos restantes para " +
+                                    "permanecer estacionado!! Caso não registre saída até a data limite de: %s. será incrementado automaticamente " +
+                                    "1 hora no período estacionado!%n",
+                            registro.getNome(),
+                            registro.getVeiculo().getPlaca(),
+                            minutosAntesDeFecharHoraLimiteParaAlertar,
+                            dataLimite.format(formatter));
+                    registro.setDataHoraUltimoAlerta(LocalDateTime.now());
+                    registrosAlertados.add(registro);
+                    logger.info(msgEmail);
+                }
+            });
         }
+        shutdownExecutor();
         estacionamentoRepository.saveAll(registrosAlertados);
     }
 
@@ -101,5 +124,16 @@ public class AlertaService {
                 : registro.getDataHoraUltimoAlerta()
                     .atZone(ZoneId.of(ZONE_ID_SAO_PAULO))
                 .plusHours(1);
+    }
+
+    private void shutdownExecutor() {
+        try {
+            if (!executorService().awaitTermination(5, TimeUnit.SECONDS)) {
+                executorService().shutdownNow();
+            }
+        } catch (InterruptedException ex) {
+            executorService().shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 }
