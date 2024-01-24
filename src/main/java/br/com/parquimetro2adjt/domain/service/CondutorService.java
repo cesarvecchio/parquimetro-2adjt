@@ -5,7 +5,7 @@ import br.com.parquimetro2adjt.application.controller.exceptions.NaoEncontradoEx
 import br.com.parquimetro2adjt.application.request.CondutorRequestDTO;
 import br.com.parquimetro2adjt.application.response.CondutorResponseDTO;
 import br.com.parquimetro2adjt.domain.entity.Condutor;
-import br.com.parquimetro2adjt.domain.entity.Veiculo;
+import br.com.parquimetro2adjt.domain.valueObject.Veiculo;
 import br.com.parquimetro2adjt.domain.enums.PagamentoEnum;
 import br.com.parquimetro2adjt.domain.valueObject.Endereco;
 import br.com.parquimetro2adjt.infra.repository.CondutorRepository;

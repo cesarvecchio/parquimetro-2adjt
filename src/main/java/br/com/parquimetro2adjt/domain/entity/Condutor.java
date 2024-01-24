@@ -2,6 +2,7 @@ package br.com.parquimetro2adjt.domain.entity;
 
 import br.com.parquimetro2adjt.domain.enums.PagamentoEnum;
 import br.com.parquimetro2adjt.domain.valueObject.Endereco;
+import br.com.parquimetro2adjt.domain.valueObject.Veiculo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

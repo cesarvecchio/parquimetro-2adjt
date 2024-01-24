@@ -1,6 +1,6 @@
 package br.com.parquimetro2adjt.application.response;
 
-import br.com.parquimetro2adjt.domain.entity.Veiculo;
+import br.com.parquimetro2adjt.domain.valueObject.Veiculo;
 import br.com.parquimetro2adjt.domain.enums.TipoEstacionamentoEnum;
 
 import java.time.LocalDateTime;

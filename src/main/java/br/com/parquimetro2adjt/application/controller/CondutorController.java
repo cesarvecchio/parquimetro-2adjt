@@ -3,7 +3,7 @@ package br.com.parquimetro2adjt.application.controller;
 import br.com.parquimetro2adjt.application.documentation.CondutorDocController;
 import br.com.parquimetro2adjt.application.request.CondutorRequestDTO;
 import br.com.parquimetro2adjt.application.response.CondutorResponseDTO;
-import br.com.parquimetro2adjt.domain.entity.Veiculo;
+import br.com.parquimetro2adjt.domain.valueObject.Veiculo;
 import br.com.parquimetro2adjt.domain.enums.PagamentoEnum;
 import br.com.parquimetro2adjt.domain.service.CondutorService;
 import br.com.parquimetro2adjt.domain.valueObject.Endereco;

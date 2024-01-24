@@ -1,7 +1,7 @@
 package br.com.parquimetro2adjt.application.documentation;
 
 import br.com.parquimetro2adjt.application.request.CondutorRequestDTO;
-import br.com.parquimetro2adjt.domain.entity.Veiculo;
+import br.com.parquimetro2adjt.domain.valueObject.Veiculo;
 import br.com.parquimetro2adjt.domain.enums.PagamentoEnum;
 import br.com.parquimetro2adjt.domain.valueObject.Endereco;
 import io.swagger.v3.oas.annotations.Operation;

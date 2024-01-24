@@ -1,4 +1,4 @@
-package br.com.parquimetro2adjt.domain.entity;
+package br.com.parquimetro2adjt.domain.valueObject;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,8 +7,8 @@ import lombok.experimental.SuperBuilder;
 
 @Data
 @NoArgsConstructor
-@SuperBuilder
 @AllArgsConstructor
+@SuperBuilder
 public class Veiculo {
 
     private String placa;

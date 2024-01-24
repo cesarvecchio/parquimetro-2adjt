@@ -5,7 +5,7 @@ import br.com.parquimetro2adjt.application.controller.exceptions.NaoEncontradoEx
 import br.com.parquimetro2adjt.application.request.VeiculoRequestDTO;
 import br.com.parquimetro2adjt.application.response.VeiculoResponseDTO;
 import br.com.parquimetro2adjt.domain.entity.Condutor;
-import br.com.parquimetro2adjt.domain.entity.Veiculo;
+import br.com.parquimetro2adjt.domain.valueObject.Veiculo;
 import br.com.parquimetro2adjt.infra.repository.CondutorRepository;
 import br.com.parquimetro2adjt.utils.Utils;
 import org.springframework.stereotype.Service;
