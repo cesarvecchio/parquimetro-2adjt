@@ -21,5 +21,8 @@ public class Estacionamento {
     private LocalDateTime horaInicial;
     private LocalDateTime horaFinal;
     private Veiculo veiculo;
+    private String nome;
+    private String email;
+    private LocalDateTime dataHoraUltimoAlerta;
     private Double valorCobrado;
 }

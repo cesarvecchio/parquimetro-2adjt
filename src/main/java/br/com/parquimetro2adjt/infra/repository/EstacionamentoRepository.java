@@ -21,4 +21,10 @@ public interface EstacionamentoRepository extends MongoRepository<Estacionamento
 
     @Query("{ horaFinal: { $eq: null } }")
     List<Estacionamento> buscarEstacionamentosAtivos();
+
+    @Query("{ horaFinal: { $eq: null }, tipoEstacionamento: 'FIXO', dataHoraUltimoAlerta: { $eq: null } }")
+    List<Estacionamento> buscarEstacionamentosAtivosPeriodoFixoNaoNotificados();
+
+    @Query("{ horaFinal: { $eq: null }, tipoEstacionamento: 'VARIAVEL' }")
+    List<Estacionamento> buscarEstacionamentosAtivosPeriodoVariavel();
 }
