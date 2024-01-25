@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.springframework.util.ObjectUtils.isEmpty;
-
 @Service
 public class VeiculoService {
     private static final String VEICULO_NAO_ENCONTRADO = "O veiculo com a placa '%s' não foi encontrado!";

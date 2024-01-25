@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -28,12 +30,16 @@ public class AlertaService {
 
     Logger logger = LoggerFactory.getLogger(AlertaService.class);
 
-    EstacionamentoRepository estacionamentoRepository;
+    private final EstacionamentoRepository estacionamentoRepository;
+    private final JavaMailSender mailSender;
 
     private static final String ZONE_ID_SAO_PAULO = "America/Sao_Paulo";
 
     @Value("${quantidade.threads}")
     private int qtThreads;
+
+    @Value("${spring.mail.username}")
+    private String from;
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -41,8 +47,9 @@ public class AlertaService {
         return Executors.newFixedThreadPool(qtThreads);
     }
 
-    public AlertaService(EstacionamentoRepository estacionamentoRepository) {
+    public AlertaService(EstacionamentoRepository estacionamentoRepository, JavaMailSender mailSender) {
         this.estacionamentoRepository = estacionamentoRepository;
+        this.mailSender = mailSender;
     }
 
     @Scheduled(cron = "0 * * * * *")
@@ -56,27 +63,7 @@ public class AlertaService {
         List<Estacionamento> registrosAlertados = new ArrayList<>();
 
         for (Estacionamento registro : registrosSemHorarioSaida) {
-            executorService().execute(() -> {
-                ZonedDateTime dataLimite = registro.getHoraInicial()
-                        .atZone(ZoneId.of(ZONE_ID_SAO_PAULO))
-                        .plusMinutes(registro.getDuracaoDesejada());
-
-                ZonedDateTime dataInicioAlerta = dataLimite.minusMinutes(minutosAntesDeFecharHoraLimiteParaAlertar);
-                if (dataAtual.isAfter(dataInicioAlerta) && dataAtual.isBefore(dataLimite)) {
-                    String msgEmail = String.format("**** ENVIANDO E-MAIL PARA ALERTAR SOBRE TEMPO RESTANTE DE ESTACIONAMENTO PERÍODO FIXO ****%n");
-                    msgEmail += String.format("Destinatário: %s%n", registro.getEmail());
-                    msgEmail += String.format("Assunto: Tempo Restante Estacionamento%n");
-                    msgEmail += String.format("Corpo: Caro(a) %s, o seu veículo de placa %s tem aproximadamente %d minutos restantes para " +
-                                    "permanecer estacionado!! Favor registrar saída até a data limite de: %s.%n",
-                            registro.getNome(),
-                            registro.getVeiculo().getPlaca(),
-                            minutosAntesDeFecharHoraLimiteParaAlertar,
-                            dataLimite.format(formatter));
-                    registro.setDataHoraUltimoAlerta(LocalDateTime.now());
-                    registrosAlertados.add(registro);
-                    logger.info(msgEmail);
-                }
-            });
+            executorService().execute(() -> enviaEmailPeriodoFixo(registro, minutosAntesDeFecharHoraLimiteParaAlertar, dataAtual, formatter, registrosAlertados));
         }
         shutdownExecutor();
         estacionamentoRepository.saveAll(registrosAlertados);
@@ -93,28 +80,65 @@ public class AlertaService {
         List<Estacionamento> registrosAlertados = new ArrayList<>();
 
         for (Estacionamento registro : registrosSemHorarioSaida) {
-            executorService().execute(() -> {
-                ZonedDateTime dataLimite = getDataLimite(registro);
-                ZonedDateTime dataInicioAlerta = dataLimite.minusMinutes(minutosAntesDeFecharHoraLimiteParaAlertar);
-                if (dataAtual.isAfter(dataInicioAlerta) && dataAtual.isBefore(dataLimite)) {
-                    String msgEmail = String.format("**** ENVIANDO E-MAIL PARA ALERTAR SOBRE TEMPO RESTANTE DE ESTACIONAMENTO PERÍODO VARIÁVEL ****%n");
-                    msgEmail += String.format("Destinatário: %s%n", registro.getEmail());
-                    msgEmail += String.format("Assunto: Tempo Restante Estacionamento%n");
-                    msgEmail += String.format("Corpo: Caro(a) %s, o seu veículo de placa %s tem aproximadamente %d minutos restantes para " +
-                                    "permanecer estacionado!! Caso não registre saída até a data limite de: %s. será incrementado automaticamente " +
-                                    "1 hora no período estacionado!%n",
-                            registro.getNome(),
-                            registro.getVeiculo().getPlaca(),
-                            minutosAntesDeFecharHoraLimiteParaAlertar,
-                            dataLimite.format(formatter));
-                    registro.setDataHoraUltimoAlerta(LocalDateTime.now());
-                    registrosAlertados.add(registro);
-                    logger.info(msgEmail);
-                }
-            });
+            executorService().execute(() -> enviaEmailPeriodoVariavel(registro, minutosAntesDeFecharHoraLimiteParaAlertar, dataAtual, formatter, registrosAlertados));
         }
         shutdownExecutor();
         estacionamentoRepository.saveAll(registrosAlertados);
+    }
+
+    private void enviaEmailPeriodoFixo(Estacionamento registro, long minutosAntesDeFecharHoraLimiteParaAlertar, ZonedDateTime dataAtual, DateTimeFormatter formatter, List<Estacionamento> registrosAlertados) {
+        ZonedDateTime dataLimite = registro.getHoraInicial()
+                .atZone(ZoneId.of(ZONE_ID_SAO_PAULO))
+                .plusHours(registro.getDuracaoDesejada());
+        ZonedDateTime dataInicioAlerta = dataLimite.minusMinutes(minutosAntesDeFecharHoraLimiteParaAlertar);
+        if (dataAtual.isAfter(dataInicioAlerta) && dataAtual.isBefore(dataLimite)) {
+
+            String logMsgEmail = String.format("**** ENVIANDO E-MAIL PARA ALERTAR SOBRE TEMPO RESTANTE DE ESTACIONAMENTO PERÍODO FIXO ****%n");
+            logMsgEmail += String.format("Destinatário: %s%n", registro.getEmail());
+            String assunto = "Tempo Restante Estacionamento";
+            logMsgEmail += String.format("Assunto: %s%n", assunto);
+            String corpoEmail = String.format("Caro(a) %s, o seu veículo de placa %s tem aproximadamente %d minutos restantes para " +
+                            "permanecer estacionado!! Favor registrar saída até a data limite de: %s.%n",
+                    registro.getNome(),
+                    registro.getVeiculo().getPlaca(),
+                    minutosAntesDeFecharHoraLimiteParaAlertar,
+                    dataLimite.format(formatter));
+            logMsgEmail += String.format("Corpo: %s", corpoEmail);
+
+            registro.setDataHoraUltimoAlerta(LocalDateTime.now());
+            registrosAlertados.add(registro);
+
+            enviarEmail(registro.getEmail(), assunto, corpoEmail);
+
+            logger.info(logMsgEmail);
+        }
+    }
+
+    private void enviaEmailPeriodoVariavel(Estacionamento registro, long minutosAntesDeFecharHoraLimiteParaAlertar, ZonedDateTime dataAtual, DateTimeFormatter formatter, List<Estacionamento> registrosAlertados) {
+        ZonedDateTime dataLimite = getDataLimite(registro);
+        ZonedDateTime dataInicioAlerta = dataLimite.minusMinutes(minutosAntesDeFecharHoraLimiteParaAlertar);
+        if (dataAtual.isAfter(dataInicioAlerta) && dataAtual.isBefore(dataLimite)) {
+
+            String logMsgEmail = String.format("**** ENVIANDO E-MAIL PARA ALERTAR SOBRE TEMPO RESTANTE DE ESTACIONAMENTO PERÍODO VARIÁVEL ****%n");
+            logMsgEmail += String.format("Destinatário: %s%n", registro.getEmail());
+            String assunto = "Tempo Restante Estacionamento";
+            logMsgEmail += String.format("Assunto: %s%n", assunto);
+            String corpoEmail = String.format("Corpo: Caro(a) %s, o seu veículo de placa %s tem aproximadamente %d minutos restantes para " +
+                            "permanecer estacionado!! Caso não registre saída até a data limite de: %s. será incrementado automaticamente " +
+                            "1 hora no período estacionado!%n",
+                    registro.getNome(),
+                    registro.getVeiculo().getPlaca(),
+                    minutosAntesDeFecharHoraLimiteParaAlertar,
+                    dataLimite.format(formatter));
+            logMsgEmail += String.format("Corpo: %s%n", corpoEmail);
+
+            registro.setDataHoraUltimoAlerta(LocalDateTime.now());
+            registrosAlertados.add(registro);
+
+            enviarEmail(registro.getEmail(), assunto, corpoEmail);
+
+            logger.info(logMsgEmail);
+        }
     }
 
     private static ZonedDateTime getDataLimite(Estacionamento registro) {
@@ -136,5 +160,14 @@ public class AlertaService {
             executorService().shutdownNow();
             Thread.currentThread().interrupt();
         }
+    }
+
+    private void enviarEmail(String email, String assunto, String corpoEmail) {
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setFrom(from);
+        simpleMailMessage.setTo(email);
+        simpleMailMessage.setSubject(assunto);
+        simpleMailMessage.setText(corpoEmail);
+        mailSender.send(simpleMailMessage);
     }
 }
