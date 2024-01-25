@@ -8,6 +8,8 @@ import br.com.parquimetro2adjt.domain.entity.Condutor;
 import br.com.parquimetro2adjt.domain.valueObject.Veiculo;
 import br.com.parquimetro2adjt.infra.repository.CondutorRepository;
 import br.com.parquimetro2adjt.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -20,6 +22,7 @@ import static org.springframework.util.ObjectUtils.isEmpty;
 @Service
 public class VeiculoService {
     private static final String VEICULO_NAO_ENCONTRADO = "O veiculo com a placa '%s' não foi encontrado!";
+    private final Logger logger = LoggerFactory.getLogger(VeiculoService.class);
     private final CondutorService condutorService;
     private final CondutorRepository condutorRepository;
     private final Utils utils;

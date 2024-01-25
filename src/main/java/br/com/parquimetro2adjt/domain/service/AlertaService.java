@@ -59,7 +59,8 @@ public class AlertaService {
             executorService().execute(() -> {
                 ZonedDateTime dataLimite = registro.getHoraInicial()
                         .atZone(ZoneId.of(ZONE_ID_SAO_PAULO))
-                        .plusHours(registro.getDuracaoDesejada());
+                        .plusMinutes(registro.getDuracaoDesejada());
+
                 ZonedDateTime dataInicioAlerta = dataLimite.minusMinutes(minutosAntesDeFecharHoraLimiteParaAlertar);
                 if (dataAtual.isAfter(dataInicioAlerta) && dataAtual.isBefore(dataLimite)) {
                     String msgEmail = String.format("**** ENVIANDO E-MAIL PARA ALERTAR SOBRE TEMPO RESTANTE DE ESTACIONAMENTO PERÍODO FIXO ****%n");

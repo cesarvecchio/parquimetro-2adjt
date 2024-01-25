@@ -12,7 +12,8 @@ import br.com.parquimetro2adjt.domain.enums.PagamentoEnum;
 import br.com.parquimetro2adjt.domain.enums.TipoEstacionamentoEnum;
 import br.com.parquimetro2adjt.infra.repository.CondutorRepository;
 import br.com.parquimetro2adjt.infra.repository.EstacionamentoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 @Service
 public class EstacionamentoService {
+    private final Logger logger = LoggerFactory.getLogger(EstacionamentoService.class);
     private final EstacionamentoRepository estacionamentoRepository;
     private final CondutorRepository condutorRepository;
     private final PagamentoService pagamentoService;
@@ -34,16 +36,22 @@ public class EstacionamentoService {
     }
 
     public EstacionamentoResponseDTO create(String placa, EstacionamentoRequestDTO requestDTO) {
+        logger.info("Iniciando registro de estacionamento para o veiculo com a placa '{}'", placa);
+
         Optional<Condutor> condutorOpt = condutorRepository.findVeiculoPorPlaca(placa);
 
         if (condutorOpt.isEmpty()) {
+            logger.warn("Veiculo com a placa '{}' não foi encontrado!", placa);
+
             throw new NaoEncontradoException(
                     String.format("O veiculo com a placa '%s' não foi encontrado!", placa));
         }
 
+        logger.info("Validando se o veiculo possui registro de estacionamento ativo");
         Optional<Estacionamento> estacionamentoOpt = estacionamentoRepository.buscarEstacionamentoAtivoPorPlaca(placa);
 
         if (estacionamentoOpt.isPresent()) {
+            logger.warn("Veiculo com a placa '{}' possui um registro de estacionamento ativo!", placa);
             throw new CadastradoException(
                     String.format("O veiculo com a placa '%s' já possui um registro de estacionamento ativo!", placa));
         }
@@ -61,6 +69,7 @@ public class EstacionamentoService {
         estacionamento.setNome(condutor.getNome());
         estacionamento.setEmail(condutor.getEmail());
 
+        logger.info("Finalizando registro de estacionamento para o veiculo com a placa '{}'", placa);
         return toResponse(estacionamentoRepository.save(estacionamento));
     }
 
@@ -69,6 +78,8 @@ public class EstacionamentoService {
     }
 
     public void validarPeriodoEPagamento(TipoEstacionamentoEnum tipoEstacionamentoEnum, PagamentoEnum pagamentoEnum) {
+        logger.info("Validando forma de pagamento!");
+
         if (TipoEstacionamentoEnum.VARIAVEL.equals(tipoEstacionamentoEnum)
                 && PagamentoEnum.PIX.equals(pagamentoEnum)) {
             throw new TipoPeriodoEPagamentoDivergentesException(
@@ -77,6 +88,8 @@ public class EstacionamentoService {
     }
 
     public void validarPeriodoFixo(EstacionamentoRequestDTO requestDTO) {
+        logger.info("Validando periodo de estacionamento!");
+
         if (TipoEstacionamentoEnum.FIXO.equals(requestDTO.tipoEstacionamento())
                 && ObjectUtils.isEmpty(requestDTO.duracaoDesejada())) {
             throw new CampoVazioException(
@@ -119,13 +132,17 @@ public class EstacionamentoService {
         return toResponse(estacionamentoRepository.save(estacionamento));
     }
 
-    public EstacionamentoResponseDTO buscarEstacionamentoFinalizadoPorPlaca(String placa) {
-        Optional<Estacionamento> estacionamentoOpt = estacionamentoRepository
+    public List<EstacionamentoResponseDTO> buscarEstacionamentoFinalizadoPorPlaca(String placa) {
+        List<Estacionamento> estacionamentoList = estacionamentoRepository
                 .buscarEstacionamentoFinalizadoPorPlaca(placa);
 
-        return toResponse(estacionamentoOpt.orElseThrow(() -> new NaoEncontradoException(
-                String.format("O Veiculo com a placa '%s' não possui nenhum registro de estacionamento finalizado!",
-                        placa))));
+        if(estacionamentoList.isEmpty()){
+            throw new NaoEncontradoException(
+                    String.format("O Veiculo com a placa '%s' não possui nenhum registro de estacionamento finalizado!",
+                            placa));
+        }
+
+        return estacionamentoList.stream().map(this::toResponse).toList();
     }
 
     public List<EstacionamentoResponseDTO> buscarEstacionamentosAtivos() {

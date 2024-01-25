@@ -35,7 +35,7 @@ public class EstacionamentoController implements EstacionamentoDocController<Est
     }
 
     @GetMapping("/{placa}/finalizado")
-    public ResponseEntity<EstacionamentoResponseDTO> buscarEstacionamentoFinalizadoPorPlaca(@PathVariable String placa) {
+    public ResponseEntity<List<EstacionamentoResponseDTO>> buscarEstacionamentoFinalizadoPorPlaca(@PathVariable String placa) {
         return ResponseEntity.ok(estacionamentoService.buscarEstacionamentoFinalizadoPorPlaca(placa));
     }
 

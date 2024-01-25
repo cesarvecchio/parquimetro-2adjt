@@ -5,6 +5,7 @@ import br.com.parquimetro2adjt.infra.repository.EstacionamentoRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,10 +17,10 @@ public class ReciboService {
     }
 
     public String gerarRecibo(String placa){
-        Optional<Estacionamento> optional = estacionamentoRepository.buscarEstacionamentoFinalizadoPorPlaca(placa);
+        List<Estacionamento> lista = estacionamentoRepository.buscarEstacionamentoFinalizadoPorPlaca(placa);
 
-        if (optional.isPresent()) {
-            Estacionamento estacionamento = optional.get();
+        if (!lista.isEmpty()) {
+            Estacionamento estacionamento = lista.get(lista.size()-1);
 
             return String.format(
                     "Recibo do Estacionamento \n"

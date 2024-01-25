@@ -17,7 +17,7 @@ public interface EstacionamentoRepository extends MongoRepository<Estacionamento
     Optional<Estacionamento> buscarEstacionamentoAtivoPorPlaca(String placa);
 
     @Query("{ 'veiculo.placa' : ?0, horaFinal: { $ne: null } }")
-    Optional<Estacionamento> buscarEstacionamentoFinalizadoPorPlaca(String placa);
+    List<Estacionamento> buscarEstacionamentoFinalizadoPorPlaca(String placa);
 
     @Query("{ horaFinal: { $eq: null } }")
     List<Estacionamento> buscarEstacionamentosAtivos();

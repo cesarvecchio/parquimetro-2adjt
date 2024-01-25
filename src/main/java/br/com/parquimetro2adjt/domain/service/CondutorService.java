@@ -10,6 +10,8 @@ import br.com.parquimetro2adjt.domain.enums.PagamentoEnum;
 import br.com.parquimetro2adjt.domain.valueObject.Endereco;
 import br.com.parquimetro2adjt.infra.repository.CondutorRepository;
 import br.com.parquimetro2adjt.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,7 @@ import java.util.List;
 
 @Service
 public class CondutorService {
+    private final Logger logger = LoggerFactory.getLogger(CondutorService.class);
     private final CondutorRepository condutorRepository;
     private final Utils utils;
 
@@ -28,11 +31,14 @@ public class CondutorService {
     }
 
     public CondutorResponseDTO cadastrar(CondutorRequestDTO condutorRequestDTO) {
+        logger.info("Iniciando cadastro do condutor!");
+
         Condutor condutor = toEntity(condutorRequestDTO);
 
         if (cpfExistente(condutorRequestDTO.cpf()))
             throw new CpfException("Esse cpf já está sendo utilizado");
 
+        logger.info("Finalizando cadastro do condutor!");
         return toResponseDto(condutorRepository.save(condutor));
     }
 

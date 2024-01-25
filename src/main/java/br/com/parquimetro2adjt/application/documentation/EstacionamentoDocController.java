@@ -26,7 +26,7 @@ public interface EstacionamentoDocController<T> {
 
     @Operation(summary = "Endpoint para buscar estacionamento finalizado por placa", description = "Buscar o estacionamentos finalizado por placa na base de dados")
     @ApiResponse(useReturnTypeSchema = true)
-    ResponseEntity<T> buscarEstacionamentoFinalizadoPorPlaca(@Parameter(description = "Placa do carro") String placa);
+    ResponseEntity<List<T>> buscarEstacionamentoFinalizadoPorPlaca(@Parameter(description = "Placa do carro") String placa);
 
     @Operation(summary = "Endpoint para buscar todos os estacionamento ativos", description = "Buscar todos os estacionamentos ativos na base de dados")
     @ApiResponse(useReturnTypeSchema = true)
