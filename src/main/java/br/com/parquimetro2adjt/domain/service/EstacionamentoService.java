@@ -73,10 +73,6 @@ public class EstacionamentoService {
         return toResponse(estacionamentoRepository.save(estacionamento));
     }
 
-    public EstacionamentoResponseDTO finalizarEstacionamento() {
-        return null;
-    }
-
     public void validarPeriodoEPagamento(TipoEstacionamentoEnum tipoEstacionamentoEnum, PagamentoEnum pagamentoEnum) {
         logger.info("Validando forma de pagamento!");
 

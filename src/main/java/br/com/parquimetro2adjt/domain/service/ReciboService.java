@@ -23,16 +23,30 @@ public class ReciboService {
             Estacionamento estacionamento = lista.get(lista.size()-1);
 
             return String.format(
-                    "Recibo do Estacionamento \n"
-                            + "------------------------ \n"
-                            + "Tipo do Estacionamento: %s \n"
-                            + "Duração Desejada: %d \n"
-                            + "Hora Inicial: %s \n"
-                            + "Hora Final: %s\n "
-                            + "Forma de Pagamento: %s\n "
-                            + "Valor: %s\n "
-                            + "Hora Final: %s\n "
-                            + "------------------------ ",
+                    """
+                    | Recibo do Estacionamento
+                    | ----------------------------------------
+                    | Nome: %s
+                    | Email: %s
+                    |
+                    | ----------------------------------------
+                    | Placa do Veiculo: %s
+                    | Tipo do Estacionamento: %s
+                    | Duração Desejada: %d horas
+                    | Hora Inicial: %s
+                    | Hora Final: %s
+                    |
+                    | ----------------------------------------
+                    | Valor: R$ %.2f
+                    |
+                    | ----------------------------------------
+                    | Horario da Emissão do Recibo: %s
+                    | ----------------------------------------
+                    
+                   """,
+                    estacionamento.getNome(),
+                    estacionamento.getEmail(),
+                    placa,
                     estacionamento.getTipoEstacionamento(),
                     estacionamento.getDuracaoDesejada(),
                     estacionamento.getHoraInicial(),

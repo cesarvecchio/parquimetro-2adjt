@@ -1,0 +1,283 @@
+{
+	"info": {
+		"_postman_id": "03bd0439-033a-4584-9132-6371651cfd38",
+		"name": "Parquimetro",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "12369015"
+	},
+	"item": [
+		{
+			"name": "Condutor",
+			"item": [
+				{
+					"name": "Cadastrar",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nome\": \"Augusto\",\r\n    \"email\": \"augusto@gmail.com\",\r\n    \"cpf\": \"22222222222\",\r\n    \"senha\": \"augusto\",\r\n    \"endereco\": {\r\n        \"cep\": \"08431370\",\r\n        \"logradouro\": \"Rua Iolanda Diorio Franca\",\r\n        \"complemento\": \"\",\r\n        \"bairro\": \"Jardim Guaianazes\",\r\n        \"cidade\": \"São Paulo\",\r\n        \"uf\": \"SP\",\r\n        \"numero\": \"30\",\r\n        \"latitude\": \"\",\r\n        \"longitude\": \"\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8080/condutores"
+					},
+					"response": []
+				},
+				{
+					"name": "FindAll",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/condutores",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"condutores"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "cpf",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "formaPagamento",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "endereco",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "veiculos",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ConsultarPorId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8080/condutores/65b182c55b6f677022e7fbf8"
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"formaPagamento\": \"PIX\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8080/condutores/659de3c1036966009d8ea7e4"
+					},
+					"response": []
+				},
+				{
+					"name": "Deletar",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "localhost:8080/condutores/6598a16fc881e34e254dedf8"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Forma de Pagamento",
+			"item": [
+				{
+					"name": "Atualizar",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": "localhost:8080/65b182c55b6f677022e7fbf8/formaPagamento/DEBITO"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Veiculo",
+			"item": [
+				{
+					"name": "BuscarPorCondutor",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8080/veiculos/condutor/65b182c55b6f677022e7fbf8"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8080/veiculos/BRA9E38"
+					},
+					"response": []
+				},
+				{
+					"name": "Cadastrar",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"placa\": \"BRA9E38\",\r\n    \"modelo\": \"Fox\",\r\n    \"cor\": \"Azul\",\r\n    \"marca\": \"Fiat\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8080/veiculos/65b182c55b6f677022e7fbf8"
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"cor\": \"Vermelho\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8080/veiculos/BRA2E11"
+					},
+					"response": []
+				},
+				{
+					"name": "Deletar",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "localhost:8080/veiculos/BRA2E11"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Estacionamento",
+			"item": [
+				{
+					"name": "Cadastrar",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tipoEstacionamento\" : \"FIXO\",\r\n    \"duracaoDesejada\" : 60\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "localhost:8080/estacionamentos/BRA9E38"
+					},
+					"response": []
+				},
+				{
+					"name": "BuscarTodosEstacionamentoPorPlaca",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8080/estacionamentos/BRA9E38"
+					},
+					"response": []
+				},
+				{
+					"name": "BuscarEstacionamentoAtivoPorPlaca",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8080/estacionamentos/BRA9E38/ativo"
+					},
+					"response": []
+				},
+				{
+					"name": "BuscarEstacionamentoFinalizadoPorPlaca",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8080/estacionamentos/BRA9E38/finalizado"
+					},
+					"response": []
+				},
+				{
+					"name": "BuscarEstacionamentosAtivos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8080/estacionamentos"
+					},
+					"response": []
+				},
+				{
+					"name": "Finalizar",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": "localhost:8080/estacionamentos/BRA9E38"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Recibo",
+			"item": [
+				{
+					"name": "Emitir",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "localhost:8080/recibos/BRA9E38"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

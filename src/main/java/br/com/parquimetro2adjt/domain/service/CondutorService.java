@@ -113,7 +113,6 @@ public class CondutorService {
 
     public Condutor toEntity(CondutorRequestDTO condutorRequestDTO) {
         return Condutor.builder()
-                .id(condutorRequestDTO.id())
                 .nome(condutorRequestDTO.nome())
                 .cpf(condutorRequestDTO.cpf())
                 .email(condutorRequestDTO.email())

@@ -1,5 +1,6 @@
 package br.com.parquimetro2adjt.application.controller;
 
+import br.com.parquimetro2adjt.application.documentation.VeiculoDocController;
 import br.com.parquimetro2adjt.application.request.VeiculoRequestDTO;
 import br.com.parquimetro2adjt.application.response.VeiculoResponseDTO;
 import br.com.parquimetro2adjt.domain.service.VeiculoService;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/veiculos")
-public class VeiculoController {
+public class VeiculoController implements VeiculoDocController<VeiculoResponseDTO> {
 
     private final VeiculoService veiculoService;
 
